@@ -30,16 +30,15 @@ resource "tsuru_app" "example" {
     ]
 }
 
-# Define env variables to the app
+# Define env variables
 
 resource "tsuru_app_env" "example" {
   app = tsuru_app.example.name
 
   environment_variables = var.public_envs
-  private_environment_variables = var.private_envs
 }
 
-# Define acls to the app
+# Define acls
 
 resource "tsuru_service_instance" "acl" {
   service_name = "acl"
@@ -58,4 +57,26 @@ resource "acl_destination_rule" "test_app" {
   instance = tsuru_service_instance.acl.name
 
   app = "google.com"
+}
+
+# Define service instance
+resource "tsuru_service_instance" "testetf_dbaas_service" {
+  service_name = var.service_name
+  name         = var.instance_name
+  owner        = tsuru_app.example.team_owner
+  description  = "Dbaas service"
+  plan         = "mongodb-standalone-4-2-dev-gcp-tsuru-us-east1-dev-gcp-tsuru-us-east1"
+  tags         = ["tag_a", "tag_b"]
+  parameters = {
+    "value"      = "10"
+    "otherValue" = "false"
+  }
+  wait_for_up_status = true
+}
+
+resource "tsuru_service_instance_bind" "instance_bind" {
+  service_name      = tsuru_service_instance.testetf_dbaas_service.service_name
+  service_instance  = tsuru_service_instance.testetf_dbaas_service.name
+  app               = tsuru_app.example.name
+  restart_on_update = true
 }

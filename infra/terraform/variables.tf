@@ -12,7 +12,10 @@ variable "public_envs" {
   description = "Public env variables"
 }
 
-variable "private_envs" {
-  type = map(string)
-  description = "Private env variables"
+variable "service_name" {
+  description = "Service name"
+}
+
+variable "instance_name" {
+  description = "Service instance name"
 }
